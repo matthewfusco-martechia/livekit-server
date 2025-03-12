@@ -21,7 +21,7 @@ func processSpeechWithOpenAI(speechInput string) (string, error) {
 
 	// Prepare the request body as per OpenAI API requirements.
 	requestBody := map[string]interface{}{
-		"model":       "text-davinci-003", // example model; adjust as needed
+		"model":       "gpt-4o-mini", // example model; adjust as needed
 		"prompt":      speechInput,
 		"max_tokens":  50,
 		"temperature": 0.7,
