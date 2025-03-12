@@ -50,6 +50,10 @@ func processSpeechWithOpenAI(speechInput string) (string, error) {
 		return "", err
 	}
 
+	// Debug output: print the HTTP status code and raw response from OpenAI.
+	fmt.Println("OpenAI API status:", resp.StatusCode)
+	fmt.Println("OpenAI raw response:", string(responseBody))
+
 	var openaiResponse map[string]interface{}
 	if err := json.Unmarshal(responseBody, &openaiResponse); err != nil {
 		return "", err
