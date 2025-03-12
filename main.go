@@ -17,7 +17,7 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 // processSpeechWithOpenAI sends the speech input to OpenAI's API and returns the generated response.
 func processSpeechWithOpenAI(speechInput string) (string, error) {
 	// OpenAI API endpoint
-	openaiURL := "https://api.openai.com/v1/completions"
+	openaiURL := "https://api.openai.com/v1/chat/completions"
 
 	// Prepare the request body using the updated model.
 	requestBody := map[string]interface{}{
