@@ -14,15 +14,20 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(w, "LiveKit is up and running!")
 }
 
-// processSpeechWithOpenAI sends the speech input to OpenAI's API and returns the generated response.
+// processSpeechWithOpenAI sends the speech input to OpenAI's Chat Completions API and returns the generated response.
 func processSpeechWithOpenAI(speechInput string) (string, error) {
-	// OpenAI API endpoint
+	// OpenAI Chat Completions endpoint.
 	openaiURL := "https://api.openai.com/v1/chat/completions"
 
-	// Prepare the request body using the updated model.
+	// Prepare the request body using the chat format.
 	requestBody := map[string]interface{}{
-		"model":       "gpt-4o-mini", // Changed model name here.
-		"prompt":      speechInput,
+		"model": "gpt-4o-mini", // Using your chosen chat model.
+		"messages": []map[string]string{
+			{
+				"role":    "user",
+				"content": speechInput,
+			},
+		},
 		"max_tokens":  50,
 		"temperature": 0.7,
 	}
@@ -50,7 +55,7 @@ func processSpeechWithOpenAI(speechInput string) (string, error) {
 		return "", err
 	}
 
-	// Debug: print the HTTP status code and raw response from OpenAI.
+	// Debug: Print the HTTP status and raw response from OpenAI.
 	fmt.Println("OpenAI API status:", resp.StatusCode)
 	fmt.Println("OpenAI raw response:", string(responseBody))
 
@@ -65,7 +70,7 @@ func processSpeechWithOpenAI(speechInput string) (string, error) {
 		return "", fmt.Errorf("OpenAI API returned error: %s", string(errorJSON))
 	}
 
-	// Extract generated text from the OpenAI response.
+	// Extract generated text from the Chat Completions response.
 	choices, ok := openaiResponse["choices"].([]interface{})
 	if !ok || len(choices) == 0 {
 		return "", fmt.Errorf("no choices in OpenAI response")
@@ -74,7 +79,11 @@ func processSpeechWithOpenAI(speechInput string) (string, error) {
 	if !ok {
 		return "", fmt.Errorf("invalid response format")
 	}
-	generatedText, ok := firstChoice["text"].(string)
+	message, ok := firstChoice["message"].(map[string]interface{})
+	if !ok {
+		return "", fmt.Errorf("invalid message format in response")
+	}
+	generatedText, ok := message["content"].(string)
 	if !ok {
 		return "", fmt.Errorf("no generated text in response")
 	}
