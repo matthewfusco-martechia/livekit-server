@@ -30,10 +30,13 @@ func webhookHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("Webhook received:", payload)
 
-	// TODO: Here you can integrate with the OpenAI API as per the realtime integration docs.
-	// For now, simply respond with a success message.
+	// Set header to indicate JSON response.
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	fmt.Fprintln(w, "Webhook received")
+
+	// Create a JSON response.
+	response := map[string]string{"message": "Webhook received"}
+	json.NewEncoder(w).Encode(response)
 }
 
 func main() {
