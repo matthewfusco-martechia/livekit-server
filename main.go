@@ -16,12 +16,12 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 
 // processSpeechWithOpenAI sends the speech input to OpenAI's API and returns the generated response.
 func processSpeechWithOpenAI(speechInput string) (string, error) {
-	// OpenAI API endpoint (this is an example; update as needed)
+	// OpenAI API endpoint
 	openaiURL := "https://api.openai.com/v1/completions"
 
-	// Prepare the request body as per OpenAI API requirements.
+	// Prepare the request body using the updated model.
 	requestBody := map[string]interface{}{
-		"model":       "gpt-4o-mini", // example model; adjust as needed
+		"model":       "gpt-4o-mini", // Changed model name here.
 		"prompt":      speechInput,
 		"max_tokens":  50,
 		"temperature": 0.7,
@@ -50,13 +50,19 @@ func processSpeechWithOpenAI(speechInput string) (string, error) {
 		return "", err
 	}
 
-	// Debug output: print the HTTP status code and raw response from OpenAI.
+	// Debug: print the HTTP status code and raw response from OpenAI.
 	fmt.Println("OpenAI API status:", resp.StatusCode)
 	fmt.Println("OpenAI raw response:", string(responseBody))
 
 	var openaiResponse map[string]interface{}
 	if err := json.Unmarshal(responseBody, &openaiResponse); err != nil {
 		return "", err
+	}
+
+	// Check if OpenAI returned an error message.
+	if errVal, exists := openaiResponse["error"]; exists {
+		errorJSON, _ := json.Marshal(errVal)
+		return "", fmt.Errorf("OpenAI API returned error: %s", string(errorJSON))
 	}
 
 	// Extract generated text from the OpenAI response.
